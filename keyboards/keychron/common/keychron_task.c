@@ -18,9 +18,6 @@
 #include "keychron_task.h"
 #include "quantum.h"
 #include "keychron_common.h"
-#ifdef FACTORY_TEST_ENABLE
-#    include "factory_test.h"
-#endif
 
 __attribute__((weak)) bool process_record_keychron_kb(uint16_t keycode, keyrecord_t *record) {
     return true;
@@ -30,9 +27,6 @@ bool process_record_keychron(uint16_t keycode, keyrecord_t *record) {
 #ifdef LK_WIRELESS_ENABLE
     extern bool process_record_wireless(uint16_t keycode, keyrecord_t * record);
     if (!process_record_wireless(keycode, record)) return false;
-#endif
-#ifdef FACTORY_TEST_ENABLE
-    if (!process_record_factory_test(keycode, record)) return false;
 #endif
     // extern bool process_record_keychron_kb(uint16_t keycode, keyrecord_t *record);
 
@@ -47,9 +41,6 @@ bool led_matrix_indicators_keychron(void) {
     extern bool led_matrix_indicators_bt(void);
     led_matrix_indicators_bt();
 #    endif
-#    ifdef FACTORY_TEST_ENABLE
-    factory_test_indicator();
-#    endif
     return true;
 }
 #endif
@@ -59,9 +50,6 @@ bool rgb_matrix_indicators_keychron(void) {
 #    ifdef LK_WIRELESS_ENABLE
     extern bool rgb_matrix_indicators_bt(void);
     rgb_matrix_indicators_bt();
-#    endif
-#    ifdef FACTORY_TEST_ENABLE
-    factory_test_indicator();
 #    endif
     return true;
 }
@@ -75,9 +63,6 @@ void keychron_task(void) {
 #ifdef LK_WIRELESS_ENABLE
     extern void wireless_tasks(void);
     wireless_tasks();
-#endif
-#ifdef FACTORY_TEST_ENABLE
-    factory_test_task();
 #endif
     keychron_common_task();
 

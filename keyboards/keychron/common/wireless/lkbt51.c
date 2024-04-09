@@ -21,13 +21,10 @@
 #include "battery.h"
 #include "raw_hid.h"
 #include "report_buffer.h"
-#include "factory_test.h"
 
-extern void factory_test_send(uint8_t* payload, uint8_t length);
-
-#    ifndef RAW_EPSIZE
-#        define RAW_EPSIZE 32
-#    endif
+#ifndef RAW_EPSIZE
+#    define RAW_EPSIZE 32
+#endif
 
 #ifndef SPI_SCK_PIN
 #    define SPI_SCK_PIN A5
@@ -610,9 +607,9 @@ void lkbt51_write_customize_data(uint8_t* data, uint8_t len) {
 }
 #ifdef RAW_ENABLE
 void lkbt51_dfu_tx(uint8_t rsp, uint8_t* data, uint8_t len, uint8_t sn) {
-    uint16_t checksum = 0;
-    uint8_t buf[RAW_EPSIZE] = {0};
-    uint8_t i               = 0;
+    uint16_t checksum        = 0;
+    uint8_t  buf[RAW_EPSIZE] = {0};
+    uint8_t  i               = 0;
 
     buf[i++] = 0x03;
     buf[i++] = 0xAA;
@@ -696,17 +693,7 @@ static void ack_handler(uint8_t* data, uint8_t len) {
     }
 }
 
-static void query_rsp_handler(uint8_t* data, uint8_t len) {
-    if (data[2]) return;
-
-    switch (data[1]) {
-        case LKBT51_CMD_IO_TEST:
-            factory_test_send(data, len);
-            break;
-        default:
-            break;
-    }
-}
+static void query_rsp_handler(uint8_t* data, uint8_t len) {}
 
 static void lkbt51_event_handler(uint8_t evt_type, uint8_t* data, uint8_t len, uint8_t sn) {
     wireless_event_t event = {0};

@@ -16,10 +16,7 @@
 
 #include "quantum.h"
 #include "keychron_task.h"
-#ifdef FACTORY_TEST_ENABLE
-#    include "factory_test.h"
-#    include "keychron_common.h"
-#endif
+#include "keychron_common.h"
 #ifdef LK_WIRELESS_ENABLE
 #    include "lkbt51.h"
 #    include "wireless.h"
@@ -59,7 +56,6 @@ void keyboard_post_init_kb(void) {
 }
 
 bool keychron_task_kb(void) {
-
     if (power_on_indicator_timer) {
         if (timer_elapsed32(power_on_indicator_timer) > POWER_ON_LED_DURATION) {
             power_on_indicator_timer = 0;
@@ -78,6 +74,6 @@ bool keychron_task_kb(void) {
 
 #ifdef LK_WIRELESS_ENABLE
 bool lpm_is_kb_idle(void) {
-    return power_on_indicator_timer == 0 && !factory_reset_indicating();
+    return power_on_indicator_timer == 0;
 }
 #endif
