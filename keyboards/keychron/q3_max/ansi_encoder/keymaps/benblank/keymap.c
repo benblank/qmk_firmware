@@ -17,28 +17,73 @@
 #include "quantum.h"
 #include "rgb_matrix.h"
 #include QMK_KEYBOARD_H
-#include "keychron_common.h"
 
 enum layers {
+    /** The base layer.
+     *
+     * Uses the encoder for volume/mute and uses the Fn key to activate the FN
+     * layer while held. Pause/Break and Scroll Lock are changed to ??? (need to
+     * figure out something to put here) and Calculator. Indicates Caps Lock is
+     * enabled by changing its color to red.
+     */
     BASE,
+
+    /** WASD mode.
+     *
+     * I'm used to a weird variant of WASD which both shifts it to ESDF *and*
+     * swaps the W/E and Space keys. In order to accomodate games which don't
+     * support remapping their controls that way (or for which I decide it's too
+     * much trouble), WASD mode adapts the keyboard instead.
+     *
+     * Specifically, it rotates left the first six alpha keys in the Q row, the
+     * first six keys in the A row, and the first *five* keys in the Z row (N is
+     * left as-is on the theory that many games use B for "backpack", so since
+     * I'm rearranging things anyway, I might as well put it somewhere handy).
+     * The W key is also swapped with Space.
+     *
+     * Activated by the keyboard's "Mac/Win" DIP switch; "Win" activates WASD
+     * Mode, while "Mac" disables it. Identified by ESDF changing to blue.
+     */
     WASD,
-    MCTL,
+
+    /** Media control mode.
+     *
+     * Remaps F9-F12 to Previous Track, Rewind¹, Fast Forward¹, and Next Track
+     * and the encoder press to Play. Because F9 and F12 are useful in many
+     * games, F5-F8 are also remapped to F5, F7, F9, and F12. (Yes, F5 is
+     * "remapped" to F5.)
+     *
+     * Activated by pressing Fn+Encoder. Identified by F5-F8 changing to green
+     * and F9-F12 changing to blue.
+     *
+     * ¹ I haven't had much luck with media players responding to the Rewind and
+     * Fast Forward keys, unfortunately.
+     */
+    MEDIA,
+
+    /** Function layer.
+     *
+     * Not heavily used, right now, but toggles media control by pressing the
+     * encoder and enters boot mode with Escape. The brightness of the white key
+     * backlights can be adjusted with the encoder.
+     */
     FN,
+
     NUM_LAYERS,
 };
 
 // This is just so the columns still line up (it's one character shorter).
-#define TG_MCTL TG(MCTL)
+#define TG_MCTL TG(MEDIA)
 
 const uint16_t PROGMEM keymaps[NUM_LAYERS][MATRIX_ROWS][MATRIX_COLS] = {
     // clang-format off
     [BASE] = LAYOUT_tkl_ansi(
-        KC_ESC , KC_F1  , KC_F2  , KC_F3  , KC_F4  , KC_F5  , KC_F6  , KC_F7  , KC_F8  , KC_F9  , KC_F10 , KC_F11 , KC_F12 , KC_MUTE, KC_PSCR, KC_ASST, KC_CALC,
+        KC_ESC , KC_F1  , KC_F2  , KC_F3  , KC_F4  , KC_F5  , KC_F6  , KC_F7  , KC_F8  , KC_F9  , KC_F10 , KC_F11 , KC_F12 , KC_MUTE, KC_PSCR, XXXXXXX, KC_CALC,
         KC_GRV , KC_1   , KC_2   , KC_3   , KC_4   , KC_5   , KC_6   , KC_7   , KC_8   , KC_9   , KC_0   , KC_MINS, KC_EQL , KC_BSPC, KC_INS , KC_HOME, KC_PGUP,
         KC_TAB , KC_Q   , KC_W   , KC_E   , KC_R   , KC_T   , KC_Y   , KC_U   , KC_I   , KC_O   , KC_P   , KC_LBRC, KC_RBRC, KC_BSLS, KC_DEL , KC_END , KC_PGDN,
         KC_CAPS, KC_A   , KC_S   , KC_D   , KC_F   , KC_G   , KC_H   , KC_J   , KC_K   , KC_L   , KC_SCLN, KC_QUOT,          KC_ENT ,
         KC_LSFT,          KC_Z   , KC_X   , KC_C   , KC_V   , KC_B   , KC_N   , KC_M   , KC_COMM, KC_DOT , KC_SLSH,          KC_RSFT,          KC_UP  ,
-        KC_LCTL, KC_LCMD, KC_LALT,                            KC_SPC ,                            KC_RALT, KC_RWIN, MO(FN) , KC_RCTL, KC_LEFT, KC_DOWN, KC_RGHT
+        KC_LCTL, KC_LGUI, KC_LALT,                            KC_SPC ,                            KC_RALT, KC_RGUI, MO(FN) , KC_RCTL, KC_LEFT, KC_DOWN, KC_RGHT
     ),
 
     [WASD] = LAYOUT_tkl_ansi(
@@ -46,11 +91,11 @@ const uint16_t PROGMEM keymaps[NUM_LAYERS][MATRIX_ROWS][MATRIX_COLS] = {
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
         _______, KC_Y   , KC_Q   , KC_SPC , KC_E   , KC_R   , KC_T   , _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
         _______, KC_H   , KC_A   , KC_S   , KC_D   , KC_F   , KC_G   , _______, _______, _______, _______, _______,          _______,
-        _______,          KC_B   , KC_Z   , KC_X   , KC_C   , KC_V   , KC_N   , _______, _______, _______, _______,          _______,          _______,
+        _______,          KC_B   , KC_Z   , KC_X   , KC_C   , KC_V   , _______, _______, _______, _______, _______,          _______,          _______,
         _______, _______, _______,                            KC_W   ,                            _______, _______, _______, _______, _______, _______, _______
     ),
 
-    [MCTL] = LAYOUT_tkl_ansi(
+    [MEDIA] = LAYOUT_tkl_ansi(
         _______, _______, _______, _______, _______, KC_F5  , KC_F7  , KC_F9  , KC_F12 , KC_MPRV, KC_MRWD, KC_MFFD, KC_MNXT, KC_MPLY, _______, _______, _______,
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
@@ -72,10 +117,10 @@ const uint16_t PROGMEM keymaps[NUM_LAYERS][MATRIX_ROWS][MATRIX_COLS] = {
 
 #if defined(ENCODER_MAP_ENABLE)
 const uint16_t PROGMEM encoder_map[NUM_LAYERS][NUM_ENCODERS][NUM_DIRECTIONS] = {
-    [BASE] = {ENCODER_CCW_CW(KC_VOLD, KC_VOLU)},
-    [WASD] = {ENCODER_CCW_CW(_______, _______)},
-    [MCTL] = {ENCODER_CCW_CW(KC_VOLD, KC_VOLU)},
-    [FN]   = {ENCODER_CCW_CW(RGB_VAD, RGB_VAI)},
+    [BASE]  = {ENCODER_CCW_CW(KC_VOLD, KC_VOLU)},
+    [WASD]  = {ENCODER_CCW_CW(_______, _______)},
+    [MEDIA] = {ENCODER_CCW_CW(KC_VOLD, KC_VOLU)},
+    [FN]    = {ENCODER_CCW_CW(RGB_VAD, RGB_VAI)},
 };
 #endif // ENCODER_MAP_ENABLE
 
@@ -95,10 +140,6 @@ bool dip_switch_update_user(uint8_t index, bool active) {
 }
 #endif // DIP_SWITCH_ENABLE
 
-bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-    return true;
-}
-
 #if defined(RGB_MATRIX_ENABLE)
 bool rgb_matrix_indicators_user() {
     if (host_keyboard_led_state().caps_lock) {
@@ -112,7 +153,7 @@ bool rgb_matrix_indicators_user() {
         rgb_matrix_set_color(54, RGB_BLUE); // F
     }
 
-    if (IS_LAYER_ON(MCTL)) {
+    if (IS_LAYER_ON(MEDIA)) {
         rgb_matrix_set_color(5, RGB_GREEN); // F5
         rgb_matrix_set_color(6, RGB_GREEN); // F6
         rgb_matrix_set_color(7, RGB_GREEN); // F7
