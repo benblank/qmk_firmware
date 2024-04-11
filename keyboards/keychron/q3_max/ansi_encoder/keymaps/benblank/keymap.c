@@ -14,6 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "keyboard.h"
 #include "quantum.h"
 #include "rgb_matrix.h"
 #include QMK_KEYBOARD_H
@@ -22,9 +23,11 @@ enum layers {
     /** The base layer.
      *
      * Uses the encoder for volume/mute and uses the Fn key to activate the FN
-     * layer while held. Pause/Break and Scroll Lock are changed to ??? (need to
-     * figure out something to put here) and Calculator. Indicates Caps Lock is
-     * enabled by changing its color to red.
+     * layer while held. Scroll Lock and Pause/Break are changed to Search and
+     * Calculator respectively.
+     *
+     * Caps Lock is indicated by changing its color to red and Caps Word by
+     * changing Left Shift's color to green.
      */
     BASE,
 
@@ -64,21 +67,23 @@ enum layers {
     /** Function layer.
      *
      * Not heavily used, right now, but toggles media control by pressing the
-     * encoder and enters boot mode with Escape. The brightness of the white key
-     * backlights can be adjusted with the encoder.
+     * encoder, toggles autocorrect with A, and enters boot mode with Escape.
+     * The brightness of the default key backlights can be adjusted with the
+     * encoder.
      */
     FN,
 
     NUM_LAYERS,
 };
 
-// This is just so the columns still line up (it's one character shorter).
+// These are just so the columns still line up.
 #define TG_MCTL TG(MEDIA)
+#define SEARCH SGUI(KC_F)
 
 const uint16_t PROGMEM keymaps[NUM_LAYERS][MATRIX_ROWS][MATRIX_COLS] = {
     // clang-format off
     [BASE] = LAYOUT_tkl_ansi(
-        KC_ESC , KC_F1  , KC_F2  , KC_F3  , KC_F4  , KC_F5  , KC_F6  , KC_F7  , KC_F8  , KC_F9  , KC_F10 , KC_F11 , KC_F12 , KC_MUTE, KC_PSCR, XXXXXXX, KC_CALC,
+        KC_ESC , KC_F1  , KC_F2  , KC_F3  , KC_F4  , KC_F5  , KC_F6  , KC_F7  , KC_F8  , KC_F9  , KC_F10 , KC_F11 , KC_F12 , KC_MUTE, KC_PSCR, SEARCH , KC_CALC,
         KC_GRV , KC_1   , KC_2   , KC_3   , KC_4   , KC_5   , KC_6   , KC_7   , KC_8   , KC_9   , KC_0   , KC_MINS, KC_EQL , KC_BSPC, KC_INS , KC_HOME, KC_PGUP,
         KC_TAB , KC_Q   , KC_W   , KC_E   , KC_R   , KC_T   , KC_Y   , KC_U   , KC_I   , KC_O   , KC_P   , KC_LBRC, KC_RBRC, KC_BSLS, KC_DEL , KC_END , KC_PGDN,
         KC_CAPS, KC_A   , KC_S   , KC_D   , KC_F   , KC_G   , KC_H   , KC_J   , KC_K   , KC_L   , KC_SCLN, KC_QUOT,          KC_ENT ,
@@ -108,7 +113,7 @@ const uint16_t PROGMEM keymaps[NUM_LAYERS][MATRIX_ROWS][MATRIX_COLS] = {
         QK_BOOT, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, TG_MCTL, _______, _______, _______,
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
-        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______,
+        _______, AC_TOGG, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______,
         _______,          _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______,          _______,
         _______, _______, _______,                            _______,                            _______, _______, _______, _______, _______, _______, _______
     ),
@@ -123,6 +128,8 @@ const uint16_t PROGMEM encoder_map[NUM_LAYERS][NUM_ENCODERS][NUM_DIRECTIONS] = {
     [FN]    = {ENCODER_CCW_CW(RGB_VAD, RGB_VAI)},
 };
 #endif // ENCODER_MAP_ENABLE
+
+// TODO?: disable caps lock in caps_word_set_user(true)
 
 #if defined(DIP_SWITCH_ENABLE)
 bool dip_switch_update_user(uint8_t index, bool active) {
@@ -140,10 +147,20 @@ bool dip_switch_update_user(uint8_t index, bool active) {
 }
 #endif // DIP_SWITCH_ENABLE
 
+void keyboard_post_init_user() {
+#if defined(AUTOCORRECT_ENABLE)
+    autocorrect_enable();
+#endif
+}
+
 #if defined(RGB_MATRIX_ENABLE)
 bool rgb_matrix_indicators_user() {
     if (host_keyboard_led_state().caps_lock) {
         rgb_matrix_set_color(50, RGB_RED);
+    }
+
+    if (is_caps_word_on()) {
+        rgb_matrix_set_color(63, RGB_GREEN);
     }
 
     if (IS_LAYER_ON(WASD)) {

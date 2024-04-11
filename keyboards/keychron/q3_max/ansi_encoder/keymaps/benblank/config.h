@@ -1,3 +1,7 @@
+// // TODO: figure out why this breaks things
+// #define CAPS_WORD_INVERT_ON_SHIFT
+
+#define DOUBLE_TAP_SHIFT_TURNS_ON_CAPS_WORD
 #define NO_ACTION_ONESHOT
 #define NO_ACTION_TAPPING
 

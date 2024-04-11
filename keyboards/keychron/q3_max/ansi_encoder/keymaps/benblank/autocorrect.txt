@@ -1,0 +1,9 @@
+:ehco:    -> echo
+:ehcoes:  -> echoes
+:lenght:  -> length
+:lenghts: -> lengths
+# # 😭
+# ;s      -> ls
+:naon:    -> nano
+:widht:   -> width
+:widhts:  -> widths
