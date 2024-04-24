@@ -16,6 +16,7 @@
 
 #include <inttypes.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include "process_key_lock.h"
 
 #define BV_64(shift) (((uint64_t)1) << (shift))
@@ -59,6 +60,24 @@ static inline uint16_t translate_keycode(uint16_t keycode) {
 void cancel_key_lock(void) {
     watching = false;
     UNSET_KEY_STATE(0x0);
+}
+
+// Returns a pointer to a newly-allocated array (remember to free it) of which keys are currently locked.
+uint64_t *get_locked_keys(void) {
+    uint64_t *locked_keys = calloc(4, sizeof(uint64_t));
+
+    locked_keys[0] = key_state[0];
+    locked_keys[1] = key_state[1];
+    locked_keys[2] = key_state[2];
+    locked_keys[3] = key_state[3];
+
+    return locked_keys;
+}
+
+bool is_key_locked(uint16_t keycode) {
+    uint16_t translated_keycode = translate_keycode(keycode);
+
+    return IS_STANDARD_KEYCODE(translated_keycode) && KEY_STATE(translated_keycode);
 }
 
 bool process_key_lock(uint16_t *keycode, keyrecord_t *record) {

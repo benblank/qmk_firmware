@@ -129,6 +129,25 @@ const uint16_t PROGMEM encoder_map[NUM_LAYERS][NUM_ENCODERS][NUM_DIRECTIONS] = {
 };
 #endif // ENCODER_MAP_ENABLE
 
+#if defined(COMBO_ENABLE)
+enum combos {
+#    if defined(KEY_LOCK_ENABLE)
+    MOD_LOCK,
+#    endif
+    NUM_COMBOS,
+};
+
+#    if defined(KEY_LOCK_ENABLE)
+const uint16_t PROGMEM mod_lock[] = {KC_LSFT, KC_RSFT, COMBO_END};
+#    endif
+
+combo_t key_combos[NUM_COMBOS] = {
+#    if defined(KEY_LOCK_ENABLE)
+    [MOD_LOCK] = COMBO(mod_lock, QK_LOCK),
+#    endif
+};
+#endif
+
 // TODO?: disable caps lock in caps_word_set_user(true)
 
 #if defined(DIP_SWITCH_ENABLE)
@@ -162,6 +181,19 @@ bool rgb_matrix_indicators_user() {
     if (is_caps_word_on()) {
         rgb_matrix_set_color(63, RGB_GREEN);
     }
+
+#    if defined(KEY_LOCK_ENABLE)
+    // TODO?: figure out a way to use get_locked_keys() to change the color of *all* locked keys
+
+    if (is_key_locked(KC_LEFT_SHIFT)) rgb_matrix_set_color(63, RGB_RED);
+    if (is_key_locked(KC_RIGHT_SHIFT)) rgb_matrix_set_color(74, RGB_RED);
+    if (is_key_locked(KC_LEFT_CTRL)) rgb_matrix_set_color(76, RGB_RED);
+    if (is_key_locked(KC_LEFT_GUI)) rgb_matrix_set_color(77, RGB_RED);
+    if (is_key_locked(KC_LEFT_ALT)) rgb_matrix_set_color(78, RGB_RED);
+    if (is_key_locked(KC_RIGHT_ALT)) rgb_matrix_set_color(80, RGB_RED);
+    if (is_key_locked(KC_RIGHT_GUI)) rgb_matrix_set_color(81, RGB_RED);
+    if (is_key_locked(KC_RIGHT_CTRL)) rgb_matrix_set_color(83, RGB_RED);
+#    endif
 
     if (IS_LAYER_ON(WASD)) {
         rgb_matrix_set_color(36, RGB_BLUE); // E

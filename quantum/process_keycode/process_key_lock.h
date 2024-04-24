@@ -21,4 +21,6 @@
 #include "action.h"
 
 void cancel_key_lock(void);
+uint64_t* get_locked_keys(void);
+bool is_key_locked(uint16_t keycode);
 bool process_key_lock(uint16_t *keycode, keyrecord_t *record);
