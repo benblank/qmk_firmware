@@ -1,9 +1,11 @@
-:ehco:    -> echo
-:ehcoes:  -> echoes
-:lenght:  -> length
-:lenghts: -> lengths
+:ehco:     -> echo
+:ehcoes:   -> echoes
+:gamepaly: -> gameplay
+:lenght:   -> length
+:lenghts:  -> lengths
 # # 😭
-# ;s      -> ls
-:naon:    -> nano
-:widht:   -> width
-:widhts:  -> widths
+# ;s       -> ls
+:naon:     -> nano
+:paly:     -> play
+:widht:    -> width
+:widhts:   -> widths
