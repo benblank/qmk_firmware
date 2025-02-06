@@ -236,10 +236,10 @@ bool rgb_matrix_indicators_user() {
         rgb_matrix_set_color(LED_F6, RGB_GREEN);
         rgb_matrix_set_color(LED_F7, RGB_GREEN);
         rgb_matrix_set_color(LED_F8, RGB_GREEN);
-        rgb_matrix_set_color(LED_F9, RGB_BLUE);
+        rgb_matrix_set_color(LED_F9, RGB_CYAN);
         rgb_matrix_set_color(LED_F10, RGB_BLUE);
         rgb_matrix_set_color(LED_F11, RGB_BLUE);
-        rgb_matrix_set_color(LED_F12, RGB_BLUE);
+        rgb_matrix_set_color(LED_F12, RGB_CYAN);
     }
 
     return false;
